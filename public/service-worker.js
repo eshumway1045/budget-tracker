@@ -20,27 +20,27 @@ const FILES_TO_CACHE = [
     '/routes/api.js'
 ];
 
-self.addEventListener('install', function (e) {
+self.addEventListener('install', function(e) {
     e.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
             console.log('your files were cached');
             return cache.addAll(FILES_TO_CACHE);
         })
-            .catch(err => {
-                console.log(err);
-            })
+        .catch(err => {
+            console.log(err);
+        })
     )
     self.skipWaiting();
 })
 
-
-self.addEventListener('activate', function (e) {
+// listen for activation of the service worker and remove old data from the cache
+self.addEventListener('activate', function(e) {
     e.waitUntil(
         caches.keys().then(keyList => {
             return Promise.all(
                 keyList.map(key => {
                     if (key !== CACHE_NAME && key !== DATA_CACHE_NAME) {
-                        console.log('deleting old cache data', key);
+                        console.log('removing old cache data', key);
                         return caches.delete(key);
                     }
                 })
@@ -50,6 +50,7 @@ self.addEventListener('activate', function (e) {
     self.clients.claim();
 })
 
+// listen for and intercept fetch requests, if there was a good request cache it if not try to get a response from cache
 self.addEventListener('fetch', function(e) {
     if (e.request.url.includes('/api/')) {
         e.respondWith(
@@ -72,7 +73,6 @@ self.addEventListener('fetch', function(e) {
       
         return;
     }
-
     e.respondWith(
     fetch(e.request).catch(function() {
         return caches.match(e.request).then(function(response) {
@@ -85,6 +85,3 @@ self.addEventListener('fetch', function(e) {
     })
     );
 });
-
-
-
