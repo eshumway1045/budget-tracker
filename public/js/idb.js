@@ -1,26 +1,28 @@
 let db;
+
 const request = indexedDB.open('budget_tracker', 1);
 
-request.onupgradeneeded = function (b) {
-    db = b.target.result;
+request.onupgradeneeded = function(e) {
+    const db = e.target.result;
 
     db.createObjectStore('new_transaction', { autoIncrement: true });
 };
 
-request.onsuccess = function (b) {
-    db = b.target.result;
+request.onsuccess = function(e) {
+    db = e.target.result;
 
     if (navigator.onLine) {
         uploadTransaction();
     }
 };
 
-request.onerror = function (b) {
-    console.log(b.target.errorCode);
+request.onerror = function(e) {
+    console.log(e.target.errorCode);
 }
 
 function saveRecord(record) {
     const transaction = db.transaction(['new_transaction'], 'readwrite');
+
     const transactionObjectStore = transaction.objectStore('new_transaction');
 
     transactionObjectStore.add(record);
