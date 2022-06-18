@@ -5,7 +5,7 @@ const compression = require("compression");
 
 const PORT = process.env.PORT || 3002;
 const MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost/transactions";
-console.log(MONGODB_URI);
+// console.log(MONGODB_URI);
 const app = express();
 
 app.use(logger("dev"));
